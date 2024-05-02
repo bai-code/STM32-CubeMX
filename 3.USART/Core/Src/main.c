@@ -44,7 +44,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-extern uint16_t Data[1];
+extern uint16_t Data[4];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,7 +88,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-HAL_UART_Receive_IT(&huart2, (uint8_t *)Data, 1);
+HAL_UART_Receive_IT(&huart2, (uint8_t *)Data, 4);  // 开启usart2 接收中断
 printf("接收数据\n");
   /* USER CODE END 2 */
 

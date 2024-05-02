@@ -245,8 +245,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
            the HAL_UART_RxHalfCpltCallback could be implemented in the user file
    */
 	if(huart->Instance == USART2){
-		HAL_UART_Transmit(huart, (uint8_t*)Data, 1, 10000);
-		HAL_UART_Receive_IT(huart, (uint8_t*)Data,1);
+		HAL_UART_Transmit(huart, (uint8_t*)Data, 4, 10000);
+		HAL_UART_Receive_IT(huart, (uint8_t*)Data,4);
 	}
 }
 /* USER CODE END 1 */

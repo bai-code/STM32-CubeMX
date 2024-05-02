@@ -42,7 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+uint16_t Data[1]; //接受数据存放位置
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -228,10 +228,25 @@ void USART2_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+// 按键--中断回调函数
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin==KEY){
 		LED_SwitchStatus();
 	}
 
+}
+
+//USART接受数据回调函数
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+ 
+
+  /* NOTE: This function should not be modified, when the callback is needed,
+           the HAL_UART_RxHalfCpltCallback could be implemented in the user file
+   */
+	if(huart->Instance == USART2){
+		HAL_UART_Transmit(huart, (uint8_t*)Data, 1, 10000);
+		HAL_UART_Receive_IT(huart, (uint8_t*)Data,1);
+	}
 }
 /* USER CODE END 1 */

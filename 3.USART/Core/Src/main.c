@@ -44,7 +44,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern uint16_t Data[1];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,7 +88,8 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+HAL_UART_Receive_IT(&huart2, (uint8_t *)Data, 1);
+printf("接收数据\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -99,8 +100,11 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		//LED_SwitchStatus();
-			printf("白哥测试\n");
-		HAL_Delay(1000);
+		//printf("白哥测试\n");
+		//HAL_Delay(1000);
+		
+		
+		
 		//HAL_Delay(500);
 		
   }

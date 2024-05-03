@@ -84,18 +84,61 @@ void USER_UART_IRQHandler(UART_HandleTypeDef *huart){
 
 #### 5. IWDG
 
+- LSI : 40KHz
+
 - 配置IWDG 喂狗间隔时间
 
-- ![1714732759142](D:\wechat\WeChat Files\wxid_oncxri5u7fxe22\FileStorage\Temp\1714732759142.jpg)
+- ![1714732759142](D:/wechat/WeChat%20Files/wxid_oncxri5u7fxe22/FileStorage/Temp/1714732759142.jpg)
 
-  例：
-
+- 例：
   - 配置10s 
     - 看表格至少128分频
     - 10000  = ( 1 / 40 ) * 128 * RL
-      - RL = 3125
+    - RL = 3125
 
-```c
+- CubeMx 参数含义
+  - psc  		     :128
+  - dc_reload_value : 3125
+  - 得到最大10s喂狗时间
 
-```
+#### 6.WWDG
 
+- 配置WWDG喂狗时间
+
+  ![image-20240503203406651](../../AppData/Roaming/Typora/typora-user-images/image-20240503203406651.png)
+
+-  例 ：配置 超时时间 50ms（最长时间）， 窗口时间20ms（最短时间）
+
+  - 依最大超时间，WDGTB = 3
+  - 超时时间：50ms = 1 / 36000 * 4096 * 2^3 *  ( T[5:0]+1 )
+    - T[5:0] + 1 ≈ 54.9
+      - T[5:0]  = 53.9
+  - 窗口时间：20ms = 1 / 36000 * 4096 * 2^3 * ( T[5:0] - W[5:0] )
+    - T[5:0] - W[5:0] ≈ 21.9
+      - W[5:0] = 32
+
+  
+
+- CubeMx 参数含义
+
+  - prc ：                            2^WDGTB   // 2的次方  
+
+  - window value ： 	64 - 127       // 0x40  -  0x7f
+
+  - downcounter value :  64 - 127
+
+    
+
+  - 例： psc  : 8    
+
+    - w_value :  0x70 
+    - dc_value : 0x7f
+
+  - 喂狗窗口：PCLK1 / 8 / 4096  =  1099Hz
+
+    - ​	    ( 0x7f - 0x3f ) / 1099 =  58ms
+    - ​	    ( 0x7f - 0x70 ) / 1099 = 14ms
+
+    
+
+  

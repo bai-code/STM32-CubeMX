@@ -82,3 +82,20 @@ void USER_UART_IRQHandler(UART_HandleTypeDef *huart){
 }
 ```
 
+#### 5. IWDG
+
+- 配置IWDG 喂狗间隔时间
+
+- ![1714732759142](D:\wechat\WeChat Files\wxid_oncxri5u7fxe22\FileStorage\Temp\1714732759142.jpg)
+
+  例：
+
+  - 配置10s 
+    - 看表格至少128分频
+    - 10000  = ( 1 / 40 ) * 128 * RL
+      - RL = 3125
+
+```c
+
+```
+

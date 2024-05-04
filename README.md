@@ -1,3 +1,7 @@
+---
+
+---
+
 #### 3.USART 使用printf打印函数不需要开启中断
 
 #### 4.USART简单的发送会导致丢失or发送卡死
@@ -107,7 +111,7 @@ void USER_UART_IRQHandler(UART_HandleTypeDef *huart){
 
   ![image-20240503203406651](../../AppData/Roaming/Typora/typora-user-images/image-20240503203406651.png)
 
--  例 ：配置 超时时间 50ms（最长时间）， 窗口时间20ms（最短时间）
+- 例 ：配置 超时时间 50ms（最长时间）， 窗口时间20ms（最短时间）
 
   - 依最大超时间，WDGTB = 3
   - 超时时间：50ms = 1 / 36000 * 4096 * 2^3 *  ( T[5:0]+1 )
@@ -139,6 +143,26 @@ void USER_UART_IRQHandler(UART_HandleTypeDef *huart){
     - ​	    ( 0x7f - 0x3f ) / 1099 =  58ms
     - ​	    ( 0x7f - 0x70 ) / 1099 = 14ms
 
-    
+- 窗口看门狗中断（达到延时复位作用）
 
-  
+  ```c
+  // 按窗口看门狗上限时间为一个周期执行一次
+  // 例：50ms
+  void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
+  {
+  	static uint32_t wwdg_count = 0;
+  	wwdg_count ++;
+  	// 例：当4s内按键按下
+  //	if(key_down){
+  //		wwdg_count = 0;  // 4s从新开始计时
+  //	}
+  	
+  	if(wwdg_count <=80){   //  50*80  = 4s 
+  		HAL_WWDG_Refresh(hwwdg);  //喂狗
+  	}else{
+  		// 超过4s 窗口看门狗复位
+  	}
+  }
+  ```
+
+  ![](https://github.com/bai-code/Typora-map-storage/blob/main/img/202405042333014.png)

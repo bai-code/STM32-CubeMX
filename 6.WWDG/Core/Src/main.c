@@ -121,8 +121,8 @@ printf("接收数据\n");
 			while(HAL_GPIO_ReadPin(GPIOA, KEY) == RESET );
 		}
 		
-		HAL_Delay(30);
-		HAL_WWDG_Refresh(&hwwdg);
+		//HAL_Delay(30);
+		//HAL_WWDG_Refresh(&hwwdg);
 		
   }
   /* USER CODE END 3 */

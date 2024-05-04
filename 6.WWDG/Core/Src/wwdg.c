@@ -39,9 +39,9 @@ void MX_WWDG_Init(void)
   /* USER CODE END WWDG_Init 1 */
   hwwdg.Instance = WWDG;
   hwwdg.Init.Prescaler = WWDG_PRESCALER_8;
-  hwwdg.Init.Window = 0x70;
-  hwwdg.Init.Counter = 0x7f;
-  hwwdg.Init.EWIMode = WWDG_EWI_DISABLE;
+  hwwdg.Init.Window = 0x4f;
+  hwwdg.Init.Counter = 0x5f;
+  hwwdg.Init.EWIMode = WWDG_EWI_ENABLE;
   if (HAL_WWDG_Init(&hwwdg) != HAL_OK)
   {
     Error_Handler();
@@ -62,6 +62,10 @@ void HAL_WWDG_MspInit(WWDG_HandleTypeDef* wwdgHandle)
   /* USER CODE END WWDG_MspInit 0 */
     /* WWDG clock enable */
     __HAL_RCC_WWDG_CLK_ENABLE();
+
+    /* WWDG interrupt Init */
+    HAL_NVIC_SetPriority(WWDG_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(WWDG_IRQn);
   /* USER CODE BEGIN WWDG_MspInit 1 */
 
   /* USER CODE END WWDG_MspInit 1 */
@@ -69,5 +73,21 @@ void HAL_WWDG_MspInit(WWDG_HandleTypeDef* wwdgHandle)
 }
 
 /* USER CODE BEGIN 1 */
-
+// 按窗口看门狗上限时间为一个周期执行一次
+// 例：50ms
+void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
+{
+	static uint32_t wwdg_count = 0;
+	wwdg_count ++;
+	// 例：当4s内按键按下
+//	if(key_down){
+//		wwdg_count = 0;  // 4s从新开始计时
+//	}
+	
+	if(wwdg_count <=80){   //  50*80  = 4s 
+		HAL_WWDG_Refresh(hwwdg);  //喂狗
+	}else{
+		// 超过4s 窗口看门狗复位
+	}
+}
 /* USER CODE END 1 */

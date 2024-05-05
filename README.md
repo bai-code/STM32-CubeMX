@@ -165,4 +165,52 @@ void USER_UART_IRQHandler(UART_HandleTypeDef *huart){
   }
   ```
 
-  ![](https://github.com/bai-code/Typora-map-storage/blob/main/img/202405042333014.png)
+  
+
+#### 7.RTC
+
+- 使能LSE（32.768）
+-  CubeMX 配置
+  - Date formate ： BCD data formate
+
+```c
+// 测试实时时钟
+void RTC_Test(void){
+	RTC_TimeTypeDef Time = {0};
+	RTC_DateTypeDef Date = {0};
+	HAL_RTC_GetTime(&hrtc, &Time, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &Date, RTC_FORMAT_BIN);
+	printf("%04d-%02d-%02d  %02d:%02d:%02d \n", 2000+Date.Year, Date.Month, 							Date.Date, Time.Hours, Time.Minutes, Time.Seconds);
+	HAL_Delay(1000);
+}
+```
+
+- 问题： 复位时钟年月日时分秒都会初始化
+
+  - 解决： MX_RTC_Init函数，注释部分代码, 会导致重新设置时间值
+
+  - 该方法会导致==年月日不被设置， 时分秒复位不会初始化==
+
+  - ```c
+      /** Initialize RTC and set the Time and Date
+      */
+    //  sTime.Hours = 0x22;
+    //  sTime.Minutes = 0x12;
+    //  sTime.Seconds = 0x30;
+    
+    //  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+    //  {
+    //    Error_Handler();
+    //  }
+    //  DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
+    //  DateToUpdate.Month = RTC_MONTH_MAY;
+    //  DateToUpdate.Date = 0x5;   //下载后时间变成2000-01-01， 年月日无法被设置
+    //  DateToUpdate.Year = 0x23;
+    
+    //  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
+    //  {
+    //    Error_Handler();
+    //  }
+    ```
+
+    

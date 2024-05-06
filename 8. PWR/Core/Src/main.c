@@ -112,10 +112,10 @@ printf(" PWR 测试程序\n");
 		
 		LED_SwitchStatus();
 		HAL_SuspendTick();  //暂停嘀嗒定时器
-		printf("system stop\n");
-		HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON ,PWR_STOPENTRY_WFI);
+		printf("system standby\n");
+		HAL_PWR_EnterSTANDBYMode();  // 待机（关机）模式
 		
-		SystemClock_Config();
+		SystemClock_Config();   // 从新初始化时钟
 		
 		HAL_ResumeTick();  // 恢复滴答定时器
 		printf("system wakeup\n");

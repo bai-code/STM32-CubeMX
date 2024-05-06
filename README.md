@@ -288,19 +288,21 @@ void RTC_Test(void){
       
       - 停止模式开启后，关闭HSI 、HSE， 时钟使用 LSI (8M) ， 恢复后仍然使用LSI，需重新配置时钟
       
+      - 唤醒方式：==WKUP引脚的上升沿、RTC闹钟事件的上升沿、NRST引脚上外部复位、IWDG复位退出待机模式==
+      
       - ```c
           while (1)
           {
-        		LED_SwitchStatus();
-        		HAL_Delay(2000);
-        		LED_SwitchStatus();
-        		printf("system running\n");
-        		
-        		LED_SwitchStatus();
-        		HAL_SuspendTick();  //暂停嘀嗒定时器
-        		printf("system stop\n");
-        		HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON ,PWR_STOPENTRY_WFI);
-        		
+          		LED_SwitchStatus();
+          		HAL_Delay(2000);
+          		LED_SwitchStatus();
+          		printf("system running\n");
+          		
+          		LED_SwitchStatus();
+          		HAL_SuspendTick();  //暂停嘀嗒定时器
+          		printf("system stop\n");
+          		HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON ,PWR_STOPENTRY_WFI);  // 开启停止模式
+          		
         -->		SystemClock_Config();   // 从新初始化时钟
         		
         		HAL_ResumeTick();  // 恢复滴答定时器

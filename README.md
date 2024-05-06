@@ -257,4 +257,61 @@ void RTC_Test(void){
 
       - 注解： 使能备份寄存器，判断备份寄存器中的某个位置是否存放某个值，如果存放，则不是第一次进入，无需重新设置时间，否则，从新设置时间（上述代码还存在bug，思路已明确）
 
+      #### 8.PWR
       
+      ##### Sleep mode
+      
+      - 各种模式都会保持该模式关闭前的引脚状态，而关闭模式为了省电，所以关闭前都应该关闭其他耗能设备
+      
+      ```c
+      while (1)
+        {
+      		LED_SwitchStatus();
+      		HAL_Delay(2000);
+      		LED_SwitchStatus();
+      		printf("system running\n");
+      		
+      		LED_SwitchStatus();
+      		HAL_SuspendTick();  //暂停嘀嗒定时器
+      		printf("system sleeping\n");
+          // params1 search “sleep mode“
+      		HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON ,PWR_SLEEPENTRY_WFI);
+      		
+      		printf("system wakeup\n");
+      		HAL_ResumeTick();  // 恢复滴答定时器
+      		// 不恢复嘀嗒定时器，将不再执行while循环
+          /* USER CODE END WHILE */
+        }
+      ```
+      
+      ##### Stop mode 
+      
+      - 停止模式开启后，关闭HSI 、HSE， 时钟使用 LSI (8M) ， 恢复后仍然使用LSI，需重新配置时钟
+      
+      - ```c
+          while (1)
+          {
+        		LED_SwitchStatus();
+        		HAL_Delay(2000);
+        		LED_SwitchStatus();
+        		printf("system running\n");
+        		
+        		LED_SwitchStatus();
+        		HAL_SuspendTick();  //暂停嘀嗒定时器
+        		printf("system stop\n");
+        		HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON ,PWR_STOPENTRY_WFI);
+        		
+        -->		SystemClock_Config();   // 从新初始化时钟
+        		
+        		HAL_ResumeTick();  // 恢复滴答定时器
+        		printf("system wakeup\n");
+        		
+        		// 不恢复嘀嗒定时器，将不再执行while循环
+        		
+        		printf("sysclk = %d hclk = %d pclk:%d pclk2:%d\n source:%d \n ", HAL_RCC_GetSysClockFreq(),HAL_RCC_GetHCLKFreq(),
+        		HAL_RCC_GetPCLK1Freq(), HAL_RCC_GetPCLK2Freq(), __HAL_RCC_GET_SYSCLK_SOURCE());
+            /* USER CODE END WHILE */
+          }
+        ```
+      
+        

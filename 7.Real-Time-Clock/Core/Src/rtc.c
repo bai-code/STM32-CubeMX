@@ -82,8 +82,7 @@ if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1)!= 0xA5A5 )  //
   }
   /* USER CODE BEGIN RTC_Init 2 */
 	HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0xA5A5);
-	HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD);
-	HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
+	
 	
 }
   /* USER CODE END RTC_Init 2 */

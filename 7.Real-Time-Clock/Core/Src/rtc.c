@@ -38,7 +38,11 @@ void MX_RTC_Init(void)
   RTC_DateTypeDef DateToUpdate = {0};
 
   /* USER CODE BEGIN RTC_Init 1 */
+	
+	__HAL_RCC_BKP_CLK_ENABLE(); // 使能BKP备份寄存器时钟
+	__HAL_RCC_PWR_CLK_ENABLE(); // 使能PWR备份寄存器电源
 
+	
   /* USER CODE END RTC_Init 1 */
 
   /** Initialize RTC Only
@@ -52,30 +56,36 @@ void MX_RTC_Init(void)
   }
 
   /* USER CODE BEGIN Check_RTC_BKUP */
-
+	 //HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0xA5A0);
+if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1)!= 0xA5A5 )  // 
+{	
   /* USER CODE END Check_RTC_BKUP */
 
   /** Initialize RTC and set the Time and Date
   */
-//  sTime.Hours = 0x22;
-//  sTime.Minutes = 0x12;
-//  sTime.Seconds = 0x30;
+  sTime.Hours = 0x22;
+  sTime.Minutes = 0x12;
+  sTime.Seconds = 0x30;
 
-//  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//  DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
-//  DateToUpdate.Month = RTC_MONTH_MAY;
-//  DateToUpdate.Date = 0x5;
-//  DateToUpdate.Year = 0x23;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
+  DateToUpdate.Month = RTC_MONTH_MAY;
+  DateToUpdate.Date = 0x5;
+  DateToUpdate.Year = 0x23;
 
-//  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
+  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN RTC_Init 2 */
-
+	HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0xA5A5);
+	HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD);
+	HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
+	
+}
   /* USER CODE END RTC_Init 2 */
 
 }
@@ -123,6 +133,7 @@ void RTC_Test(void){
 	HAL_RTC_GetDate(&hrtc, &Date, RTC_FORMAT_BIN);
 	printf("%04d-%02d-%02d  %02d:%02d:%02d \n", 2000+Date.Year, Date.Month, Date.Date,
 																		Time.Hours, Time.Minutes, Time.Seconds);
+
 	HAL_Delay(1000);
 }
 /* USER CODE END 1 */

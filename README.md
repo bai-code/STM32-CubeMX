@@ -213,4 +213,48 @@ void RTC_Test(void){
     //  }
     ```
 
-    
+  - 解决复位保存年月日时分秒
+
+    - ==使用备份寄存器，保存一个标志，如果该位置不存在某个定值，则会初始化==
+
+    - ```c
+        /* USER CODE BEGIN RTC_Init 1 */
+        	
+        	__HAL_RCC_BKP_CLK_ENABLE(); // 使能BKP备份寄存器时钟
+        	__HAL_RCC_PWR_CLK_ENABLE(); // 使能PWR备份寄存器电源
+        	
+        /* USER CODE END RTC_Init 1 */
+      ```
+
+      ```c
+       --》if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1)!= 0xA5A5 )   // 判断寄存器是否存在存储的固定值
+      {	
+        /* USER CODE END Check_RTC_BKUP */
+      
+        /** Initialize RTC and set the Time and Date
+        */
+        sTime.Hours = 0x22;
+        sTime.Minutes = 0x12;
+        sTime.Seconds = 0x30;
+      
+        if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+        {
+          Error_Handler();
+        }
+        DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
+        DateToUpdate.Month = RTC_MONTH_MAY;
+        DateToUpdate.Date = 0x5;
+        DateToUpdate.Year = 0x23;
+      
+        if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
+        {
+          Error_Handler();
+        }
+        /* USER CODE BEGIN RTC_Init 2 */
+      --》	HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0xA5A5);   //进判断后，把固定值存放
+      }
+      ```
+
+      - 注解： 使能备份寄存器，判断备份寄存器中的某个位置是否存放某个值，如果存放，则不是第一次进入，无需重新设置时间，否则，从新设置时间（上述代码还存在bug，思路已明确）
+
+      

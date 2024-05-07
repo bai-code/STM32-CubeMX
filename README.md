@@ -316,4 +316,38 @@ void RTC_Test(void){
           }
         ```
       
+        #### Standby mode
         
+        - ```c
+          int main(void){
+          	
+          	HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  //开启wakeup 引脚唤醒功能
+              while(1){
+                  LED_SwitchStatus();
+          		HAL_Delay(2000);
+          		LED_SwitchStatus();
+          		printf("system running\n");
+          		
+          		LED_SwitchStatus();
+          		HAL_SuspendTick();  //暂停嘀嗒定时器
+          		printf("system standby\n");
+          		
+          		
+          		SystemClock_Config();   // 从新初始化时钟
+          		
+          		HAL_ResumeTick();  // 恢复滴答定时器
+          		printf("system wakeup\n");
+          		
+          		// 不恢复嘀嗒定时器，将不再执行while循环
+          		
+          		printf("sysclk = %d hclk = %d pclk:%d pclk2:%d\n source:%d \n ", 				HAL_RCC_GetSysClockFreq(),HAL_RCC_GetHCLKFreq(),
+          		HAL_RCC_GetPCLK1Freq(), HAL_RCC_GetPCLK2Freq(), __HAL_RCC_GET_SYSCLK_SOURCE());
+          -->     __HAL_RCC_PWR_CLK_ENABLE();     //使能PWR时钟
+          -->    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);      //清除Wake_UP标志
+          -->		HAL_PWR_EnterSTANDBYMode();  // 待机（关机）模式	
+                  
+              }
+          }
+          ```
+        
+          

@@ -90,6 +90,7 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 //HAL_UART_Receive_IT(&huart2, (uint8_t *)Data, 4);  // 开启usart2 接收中断
 //HAL_UART_Receive_DMA(&huart2, (uint8_t *)Data, 4);  //启用usart2 dma功能
@@ -97,7 +98,9 @@ int main(void)
 HAL_UART_Receive_DMA(&huart2, (uint8_t *)RX2_DATA, RX2_LEN); //使能uart2，dma功能
 __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);  //使能uart2， idle中断
 printf(" PWR 测试程序\n");
+HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  //开启wakeup 引脚唤醒功能
 //HAL_UART_Transmit_DMA(&huart2, (uint8_t *)"USART DMA TEST", sizeof("USART DMA TEST"));
+
 
   /* USER CODE END 2 */
 
@@ -105,6 +108,11 @@ printf(" PWR 测试程序\n");
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		
+   
+    //HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);   //设置WAKEUP用于唤醒
+    //HAL_PWR_EnterSTANDBYMode();     //进入待机模式
+
 		LED_SwitchStatus();
 		HAL_Delay(2000);
 		LED_SwitchStatus();
@@ -113,7 +121,7 @@ printf(" PWR 测试程序\n");
 		LED_SwitchStatus();
 		HAL_SuspendTick();  //暂停嘀嗒定时器
 		printf("system standby\n");
-		HAL_PWR_EnterSTANDBYMode();  // 待机（关机）模式
+		
 		
 		SystemClock_Config();   // 从新初始化时钟
 		
@@ -124,7 +132,10 @@ printf(" PWR 测试程序\n");
 		
 		printf("sysclk = %d hclk = %d pclk:%d pclk2:%d\n source:%d \n ", HAL_RCC_GetSysClockFreq(),HAL_RCC_GetHCLKFreq(),
 		HAL_RCC_GetPCLK1Freq(), HAL_RCC_GetPCLK2Freq(), __HAL_RCC_GET_SYSCLK_SOURCE());
-    /* USER CODE END WHILE */
+     __HAL_RCC_PWR_CLK_ENABLE();     //使能PWR时钟
+    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);      //清除Wake_UP标志
+		HAL_PWR_EnterSTANDBYMode();  // 待机（关机）模式
+		/* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 		//LED_SwitchStatus();

@@ -369,12 +369,37 @@ void RTC_Test(void){
   		//adc_value = adc_value /10;
   		//0    ----- 0v
   		//4096 ------3.3v
-  		//val = x/4096*3.3
+  		//val = x/4095*3.3
   		
-  		float val = ((float)adc_value/4096*3.3);
+  		float val = ((float)adc_value/4095*3.3);
   		printf("adc_value: %.2f \n", val);
   		HAL_Delay(500);
   	}
+  ```
+
+- 测量stm32  MCU温度
+
+  ```c
+   while (1)
+    {
+  		uint32_t adc_value = 0;
+  		//for(uint8_t i = 0; i<10; i++){
+  			HAL_ADC_Start(&hadc1);  // 启动adc，启动一次工作一次
+  			if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK){ // 等待adc转换结束， 100：timeout时间
+  				adc_value = HAL_ADC_GetValue(&hadc1);
+  				//adc_value += HAL_ADC_GetValue(&hadc1);  //10次求平均值数值更准确
+  			}
+  		//}
+  		//adc_value = adc_value /10;
+  		//0    ----- 0v
+  		//4095 ------3.3v
+  		//val = x/4095*3.3
+  		
+  -->		float cpu_temper = (1.43 - adc_value*3.3/4095)/0.0043 + 25; //查看电气特性，
+  		//float val = (adc_value*3.3/4095);
+  		printf("adc_value: %.2f \n", cpu_temper);
+  		HAL_Delay(500);
+   }
   ```
 
   

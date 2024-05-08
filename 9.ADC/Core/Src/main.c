@@ -118,10 +118,11 @@ printf("ADC TEST\n");
 		//adc_value = adc_value /10;
 		//0    ----- 0v
 		//4095 ------3.3v
-		//val = x/4096*3.3
+		//val = x/4095*3.3
 		
-		float val = (adc_value*3.3/4095);
-		printf("adc_value: %.2f \n", val);
+		float cpu_temper = (1.43 - adc_value*3.3/4095)/0.0043 + 25; //查看电气特性，
+		//float val = (adc_value*3.3/4095);
+		printf("adc_value: %.2f \n", cpu_temper);
 		HAL_Delay(500);
 		
 		

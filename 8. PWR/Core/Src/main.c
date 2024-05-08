@@ -110,8 +110,7 @@ HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  //开启wakeup 引脚唤醒功能
   {
 		
    
-    //HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);   //设置WAKEUP用于唤醒
-    //HAL_PWR_EnterSTANDBYMode();     //进入待机模式
+   
 
 		LED_SwitchStatus();
 		HAL_Delay(2000);

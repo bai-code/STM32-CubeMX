@@ -257,97 +257,124 @@ void RTC_Test(void){
 
       - 注解： 使能备份寄存器，判断备份寄存器中的某个位置是否存放某个值，如果存放，则不是第一次进入，无需重新设置时间，否则，从新设置时间（上述代码还存在bug，思路已明确）
 
-      #### 8.PWR
-      
-      ##### Sleep mode
-      
-      - 各种模式都会保持该模式关闭前的引脚状态，而关闭模式为了省电，所以关闭前都应该关闭其他耗能设备
-      
-      ```c
-      while (1)
-        {
-      		LED_SwitchStatus();
-      		HAL_Delay(2000);
-      		LED_SwitchStatus();
-      		printf("system running\n");
-      		
-      		LED_SwitchStatus();
-      		HAL_SuspendTick();  //暂停嘀嗒定时器
-      		printf("system sleeping\n");
-          // params1 search “sleep mode“
-      		HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON ,PWR_SLEEPENTRY_WFI);
-      		
-      		printf("system wakeup\n");
-      		HAL_ResumeTick();  // 恢复滴答定时器
-      		// 不恢复嘀嗒定时器，将不再执行while循环
-          /* USER CODE END WHILE */
+
+#### 8.PWR
+
+##### Sleep mode
+
+- 各种模式都会保持该模式关闭前的引脚状态，而关闭模式为了省电，所以关闭前都应该关闭其他耗能设备
+
+  ```c
+  while (1)
+    {
+  		LED_SwitchStatus();
+  		HAL_Delay(2000);
+  		LED_SwitchStatus();
+  		printf("system running\n");
+  		
+  		LED_SwitchStatus();
+  		HAL_SuspendTick();  //暂停嘀嗒定时器
+  		printf("system sleeping\n");
+      // params1 search “sleep mode“
+  		HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON ,PWR_SLEEPENTRY_WFI);
+  		
+  		printf("system wakeup\n");
+  		HAL_ResumeTick();  // 恢复滴答定时器
+  		// 不恢复嘀嗒定时器，将不再执行while循环
+      /* USER CODE END WHILE */
+    }
+  ```
+
+##### Stop mode 
+
+- 停止模式开启后，关闭HSI 、HSE， 时钟使用 LSI (8M) ， 恢复后仍然使用LSI，需重新配置时钟
+
+- 唤醒方式：==WKUP引脚的上升沿、RTC闹钟事件的上升沿、NRST引脚上外部复位、IWDG复位退出待机模式==
+
+    ```c
+    while (1)
+    {
+    		LED_SwitchStatus();
+    		HAL_Delay(2000);
+    		LED_SwitchStatus();
+    		printf("system running\n");
+    		
+    		LED_SwitchStatus();
+    		HAL_SuspendTick();  //暂停嘀嗒定时器
+    		printf("system stop\n");
+    		HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON ,PWR_STOPENTRY_WFI);  // 开启停止模式
+    		
+    -->		SystemClock_Config();   // 从新初始化时钟
+    		
+    		HAL_ResumeTick();  // 恢复滴答定时器
+    		printf("system wakeup\n");
+    		
+    		// 不恢复嘀嗒定时器，将不再执行while循环
+    		
+    		printf("sysclk = %d hclk = %d pclk:%d pclk2:%d\n source:%d \n ", HAL_RCC_GetSysClockFreq(),HAL_RCC_GetHCLKFreq(),
+    		HAL_RCC_GetPCLK1Freq(), HAL_RCC_GetPCLK2Freq(), __HAL_RCC_GET_SYSCLK_SOURCE());
+        /* USER CODE END WHILE */
+      }
+    ```
+
+    ##### Standby mode
+
+    ```c
+    int main(void){
+    	
+    	HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  //开启wakeup 引脚唤醒功能
+        while(1){
+            LED_SwitchStatus();
+    		HAL_Delay(2000);
+    		LED_SwitchStatus();
+    		printf("system running\n");
+    		
+    		LED_SwitchStatus();
+    		HAL_SuspendTick();  //暂停嘀嗒定时器
+    		printf("system standby\n");
+    		
+    		
+    		SystemClock_Config();   // 从新初始化时钟
+    		
+    		HAL_ResumeTick();  // 恢复滴答定时器
+    		printf("system wakeup\n");
+    		
+    		// 不恢复嘀嗒定时器，将不再执行while循环
+    		
+    		printf("sysclk = %d hclk = %d pclk:%d pclk2:%d\n source:%d \n ", 				HAL_RCC_GetSysClockFreq(),HAL_RCC_GetHCLKFreq(),
+    		HAL_RCC_GetPCLK1Freq(), HAL_RCC_GetPCLK2Freq(), __HAL_RCC_GET_SYSCLK_SOURCE());
+    -->     __HAL_RCC_PWR_CLK_ENABLE();     //使能PWR时钟
+    -->    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);      //清除Wake_UP标志
+    -->		HAL_PWR_EnterSTANDBYMode();  // 待机（关机）模式	
+            
         }
-      ```
-      
-      ##### Stop mode 
-      
-      - 停止模式开启后，关闭HSI 、HSE， 时钟使用 LSI (8M) ， 恢复后仍然使用LSI，需重新配置时钟
-      
-      - 唤醒方式：==WKUP引脚的上升沿、RTC闹钟事件的上升沿、NRST引脚上外部复位、IWDG复位退出待机模式==
-      
-      - ```c
-          while (1)
-          {
-          		LED_SwitchStatus();
-          		HAL_Delay(2000);
-          		LED_SwitchStatus();
-          		printf("system running\n");
-          		
-          		LED_SwitchStatus();
-          		HAL_SuspendTick();  //暂停嘀嗒定时器
-          		printf("system stop\n");
-          		HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON ,PWR_STOPENTRY_WFI);  // 开启停止模式
-          		
-        -->		SystemClock_Config();   // 从新初始化时钟
-        		
-        		HAL_ResumeTick();  // 恢复滴答定时器
-        		printf("system wakeup\n");
-        		
-        		// 不恢复嘀嗒定时器，将不再执行while循环
-        		
-        		printf("sysclk = %d hclk = %d pclk:%d pclk2:%d\n source:%d \n ", HAL_RCC_GetSysClockFreq(),HAL_RCC_GetHCLKFreq(),
-        		HAL_RCC_GetPCLK1Freq(), HAL_RCC_GetPCLK2Freq(), __HAL_RCC_GET_SYSCLK_SOURCE());
-            /* USER CODE END WHILE */
-          }
-        ```
-      
-        #### Standby mode
-        
-        - ```c
-          int main(void){
-          	
-          	HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  //开启wakeup 引脚唤醒功能
-              while(1){
-                  LED_SwitchStatus();
-          		HAL_Delay(2000);
-          		LED_SwitchStatus();
-          		printf("system running\n");
-          		
-          		LED_SwitchStatus();
-          		HAL_SuspendTick();  //暂停嘀嗒定时器
-          		printf("system standby\n");
-          		
-          		
-          		SystemClock_Config();   // 从新初始化时钟
-          		
-          		HAL_ResumeTick();  // 恢复滴答定时器
-          		printf("system wakeup\n");
-          		
-          		// 不恢复嘀嗒定时器，将不再执行while循环
-          		
-          		printf("sysclk = %d hclk = %d pclk:%d pclk2:%d\n source:%d \n ", 				HAL_RCC_GetSysClockFreq(),HAL_RCC_GetHCLKFreq(),
-          		HAL_RCC_GetPCLK1Freq(), HAL_RCC_GetPCLK2Freq(), __HAL_RCC_GET_SYSCLK_SOURCE());
-          -->     __HAL_RCC_PWR_CLK_ENABLE();     //使能PWR时钟
-          -->    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);      //清除Wake_UP标志
-          -->		HAL_PWR_EnterSTANDBYMode();  // 待机（关机）模式	
-                  
-              }
-          }
-          ```
-        
-          
+    }
+    ```
+
+#### 9.ADC
+
+- 单次转换，不连续，不扫描
+
+  ```c
+  while (1)
+    {
+  		uint32_t adc_value = 0;
+  		//for(uint8_t i = 0; i<10; i++){
+  			HAL_ADC_Start(&hadc1);  // 启动adc，启动一次工作一次
+  			if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK){ // 等待adc转换结束， 100：timeout时间
+  				adc_value = HAL_ADC_GetValue(&hadc1);
+  				//adc_value += HAL_ADC_GetValue(&hadc1);  //10次求平均值数值更准确
+  			}
+  		//}
+  		//adc_value = adc_value /10;
+  		//0    ----- 0v
+  		//4096 ------3.3v
+  		//val = x/4096*3.3
+  		
+  		float val = ((float)adc_value/4096*3.3);
+  		printf("adc_value: %.2f \n", val);
+  		HAL_Delay(500);
+  	}
+  ```
+
+  
